@@ -474,35 +474,7 @@
       font-size: 0.85em;
     }
 
-    .tab-bar {
-      display: flex;
-      gap: 0;
-      margin-bottom: 1.5rem;
-      border-bottom: 1px solid rgba(26,18,8,0.1);
-    }
 
-    .tab {
-      padding: 0.6rem 1.25rem;
-      font-size: 0.8rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      cursor: pointer;
-      border: none;
-      background: none;
-      color: rgba(26,18,8,0.4);
-      border-bottom: 2px solid transparent;
-      margin-bottom: -1px;
-      font-family: 'DM Sans', sans-serif;
-      transition: color 0.2s;
-    }
-
-    .tab.active {
-      color: var(--ink);
-      border-bottom-color: var(--gold);
-    }
-
-    .tab-content { display: none; }
-    .tab-content.active { display: block; }
 
   </style>
 </head>
@@ -532,26 +504,9 @@
 
   <main>
 
-    <!-- TAB NAVIGATION -->
-    <div class="tab-bar">
-      <button class="tab active" onclick="switchTab('search')">🔍 Search</button>
-      <button class="tab" onclick="switchTab('setup')">⚙️ Setup Guide</button>
-    </div>
-
-    <!-- ======= SEARCH TAB ======= -->
-    <div id="tab-search" class="tab-content active">
-
       <div class="search-card">
 
         <div class="form-grid">
-          <!--
-            LESSON 4: FORM ELEMENTS
-            <select> = dropdown menu
-            <option> = each item inside the dropdown
-            <input>  = text box for typing
-            The "id" attribute gives each element a unique name
-            so JavaScript can find it later.
-          -->
           <div class="field">
             <label class="search-label" for="city-select">Choose a City</label>
             <select id="city-select">
@@ -577,127 +532,23 @@
 
           <div class="field">
             <label class="search-label" for="dish-input">What Are You Craving?</label>
-            <input
-              type="text"
-              id="dish-input"
-              placeholder="e.g. chicken caesar wrap"
-            />
+            <input type="text" id="dish-input" placeholder="e.g. chicken caesar wrap"/>
           </div>
         </div>
 
-        <!--
-          LESSON 5: BUTTONS & EVENTS
-          onclick="searchRestaurants()" means:
-          "When this button is clicked, run the JavaScript
-           function called searchRestaurants"
-        -->
         <button class="search-btn" id="search-btn" onclick="searchRestaurants()">
           Search Menus
         </button>
-
-
 
       </div>
 
       <!-- Results appear here dynamically -->
       <div id="results"></div>
 
-    </div><!-- end search tab -->
-
-
-    <!-- ======= SETUP GUIDE TAB ======= -->
-    <div id="tab-setup" class="tab-content">
-      <div class="setup-panel">
-        <h2>Deploying Your Backend Server (Free)</h2>
-        <p style="font-size:0.88rem;color:rgba(26,18,8,0.6);margin-bottom:1.5rem;line-height:1.7">
-          We'll deploy a tiny Java server to <strong>Render.com</strong> for free.
-          It acts as a secure middleman between CraveFinder and Foursquare — solving
-          the CORS problem permanently. No credit card needed.
-        </p>
-
-        <div class="step">
-          <div class="step-num">1</div>
-          <div class="step-text">
-            <strong>Create a free GitHub account</strong> at
-            <a href="https://github.com" target="_blank" style="color:var(--gold)">github.com</a>
-            if you don't have one. GitHub is where developers store and share code —
-            think of it like Google Drive but for code.
-          </div>
-        </div>
-
-        <div class="step">
-          <div class="step-num">2</div>
-          <div class="step-text">
-            <strong>Upload the server files to a new GitHub repository.</strong>
-            <br/>① Click the <strong>+</strong> icon on GitHub → <strong>"New repository"</strong>
-            <br/>② Name it <code>cravefinder-server</code> → click <strong>"Create repository"</strong>
-            <br/>③ Upload these files (drag & drop onto the page):
-            <code>pom.xml</code>, <code>render.yaml</code>, and the
-            <code>src/</code> folder with the Java files inside
-            (download them from the files below ↓)
-          </div>
-        </div>
-
-        <div class="step">
-          <div class="step-num">3</div>
-          <div class="step-text">
-            <strong>Create a free Render.com account</strong> at
-            <a href="https://render.com" target="_blank" style="color:var(--gold)">render.com</a>
-            — sign up with your GitHub account (one click).
-          </div>
-        </div>
-
-        <div class="step">
-          <div class="step-num">4</div>
-          <div class="step-text">
-            <strong>Create a new Web Service on Render.</strong>
-            <br/>① Click <strong>"New +"</strong> → <strong>"Web Service"</strong>
-            <br/>② Connect your GitHub repo (<code>cravefinder-server</code>)
-            <br/>③ Render reads <code>render.yaml</code> and fills in the settings automatically
-            <br/>④ Under <strong>"Environment Variables"</strong>, add:
-            <br/>&nbsp;&nbsp;&nbsp;Key: <code>FOURSQUARE_API_KEY</code>
-            <br/>&nbsp;&nbsp;&nbsp;Value: <em>your Foursquare API key</em>
-            <br/>⑤ Click <strong>"Create Web Service"</strong> — Render builds and deploys it!
-          </div>
-        </div>
-
-        <div class="step">
-          <div class="step-num">5</div>
-          <div class="step-text">
-            <strong>Copy your server URL and paste it below.</strong>
-            After deploying, Render gives you a URL like
-            <code>https://cravefinder-api.onrender.com</code>.
-            Paste it here and click Save:
-            <br/><br/>
-            <input type="text" id="api-key-input" placeholder="https://your-app-name.onrender.com" style="margin-top:0.25rem"/>
-            <button onclick="saveApiKey()" style="margin-top:0.5rem;padding:0.6rem 1.25rem;background:var(--ink);color:var(--cream);border:none;border-radius:2px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:0.82rem;letter-spacing:0.08em">
-              Save URL
-            </button>
-            <span id="key-saved" style="display:none;color:var(--sage);font-size:0.82rem;margin-left:0.75rem">✓ Saved!</span>
-            <br/><br/>
-            You can verify it works by visiting:
-            <code id="health-url">https://your-app.onrender.com/api/health</code>
-            — it should show <code>{"status":"ok"}</code>
-          </div>
-        </div>
-
-        <div class="step">
-          <div class="step-num">6</div>
-          <div class="step-text">
-            <strong>⚠️ Free tier note:</strong> Render's free servers
-            "spin down" after 15 minutes of inactivity. The first search
-            after a long break may take 30–60 seconds to wake up.
-            After that, it's fast. This is normal and expected on the free plan!
-          </div>
-        </div>
-
-      </div>
-    </div><!-- end setup tab -->
-
   </main>
 
   <footer>
-    CraveFinder &mdash; Powered by Foursquare Places API &mdash; A learning project
+    CraveFinder &mdash; Powered by Google Places
   </footer>
 
 
@@ -740,36 +591,8 @@
       "Pittsburgh,PA":     { lat: 40.4406, lon: -79.9959 },
     };
 
-    // This will hold the user's Foursquare API key once they enter it
-    let fsqApiKey = localStorage.getItem('fsqKey') || '';
-
-    // ---- LESSON 8: FUNCTIONS ----
-    // A function is a reusable block of code. We define it once, call it many times.
-
-    function switchTab(name) {
-      // Hide all tab contents
-      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-      document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
-
-      // Show the chosen one
-      document.getElementById('tab-' + name).classList.add('active');
-      // Find the matching tab button and highlight it
-      document.querySelectorAll('.tab').forEach(btn => {
-        if (btn.getAttribute('onclick').includes(name)) btn.classList.add('active');
-      });
-    }
-
-    function saveApiKey() {
-      const val = document.getElementById('api-key-input').value.trim().replace(/\/$/, '');
-      if (val) {
-        localStorage.setItem('serverUrl', val);
-        // Update the health check URL display
-        const healthEl = document.getElementById('health-url');
-        if (healthEl) healthEl.textContent = val + '/api/health';
-        document.getElementById('key-saved').style.display = 'inline';
-        setTimeout(() => document.getElementById('key-saved').style.display = 'none', 3000);
-      }
-    }
+    // Server URL — hardcoded, no setup needed for end users
+    const SERVER_URL = 'https://cravefinder-server-1.onrender.com';
 
     // ---- THE MAIN SEARCH FUNCTION ----
     async function searchRestaurants() {
@@ -790,13 +613,7 @@
       resultsDiv.innerHTML = '<div class="state-msg"><div class="icon">🔍</div><p>Scanning menus across ' + city + '…</p></div>';
 
       try {
-        const serverUrl = localStorage.getItem('serverUrl');
-        if (serverUrl) {
-          await searchFoursquare(city, dish);
-        } else {
-          await new Promise(r => setTimeout(r, 1200));
-          showDemoResults(city, dish);
-        }
+        await searchFoursquare(city, dish);
       } catch (err) {
         document.getElementById('results').innerHTML = `
           <div class="state-msg">
@@ -819,14 +636,8 @@
       btn.disabled = false;
     }
 
-    // ---- SEARCH VIA YOUR RENDER.COM BACKEND ----
+    // ---- SEARCH VIA RENDER.COM BACKEND ----
     async function searchFoursquare(city, dish) {
-      const SERVER_URL = localStorage.getItem('serverUrl') || '';
-
-      if (!SERVER_URL) {
-        throw new Error('Server URL not set. Go to ⚙️ Setup Guide and enter your Render.com URL.');
-      }
-
       const url = `${SERVER_URL}/api/search?dish=${encodeURIComponent(dish)}&city=${encodeURIComponent(city)}`;
       const response = await fetch(url);
 
@@ -988,21 +799,10 @@
         </div>`;
     }
 
-    // ---- LESSON 10: EVENT LISTENERS ----
     // Allow pressing Enter in the dish input to trigger search
     document.getElementById('dish-input').addEventListener('keydown', function(e) {
       if (e.key === 'Enter') searchRestaurants();
-      // 'e' is the event object — it tells us which key was pressed
     });
-
-    // Pre-fill server URL input if one was previously saved
-    const savedUrl = localStorage.getItem('serverUrl');
-    if (savedUrl) {
-      const inp = document.getElementById('api-key-input');
-      if (inp) inp.value = savedUrl;
-      const healthEl = document.getElementById('health-url');
-      if (healthEl) healthEl.textContent = savedUrl + '/api/health';
-    }
 
     // ============================================================
     // PWA: REGISTER SERVICE WORKER
