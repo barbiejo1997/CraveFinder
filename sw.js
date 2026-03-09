@@ -18,13 +18,14 @@
 
 // Version your cache — when you update the app, change this
 // string to force all users to get the fresh version
-const CACHE_NAME = 'cravefinder-v1';
+const CACHE_NAME = 'cravefinder-v2';
 
-// These are the files we cache immediately when the app installs
-// so the app shell loads instantly even with no internet
 const CORE_FILES = [
-  '/index.html',
-  '/manifest.json'
+  '/cravefinder/',
+  '/cravefinder/index.html',
+  '/cravefinder/manifest.json',
+  '/cravefinder/icons/icon-192.png',
+  '/cravefinder/icons/icon-512.png'
 ];
 
 // ---- INSTALL EVENT ----
