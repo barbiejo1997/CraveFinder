@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CraveFinder — Find Any Dish, Anywhere</title>
+
+  <!-- PWA MANIFEST: Tells the phone this app is installable -->
+  <link rel="manifest" href="manifest.json"/>
+
+  <!-- iOS specific tags — Apple requires these separately -->
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="apple-mobile-web-app-title" content="CraveFinder"/>
+  <link rel="apple-touch-icon" href="icons/icon-192.png"/>
+
+  <!-- Theme color — colors the browser chrome on Android -->
+  <meta name="theme-color" content="#1a1208"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+
+  <!--
+    ============================================================
+    LESSON 1: HTML HEAD SECTION
+    ============================================================
+    Everything inside <head> is setup — the browser reads it
+    but doesn't show it to the user. We're doing 3 things here:
+    1. Setting the page title (shows in browser tab)
+    2. Telling the browser how to handle screen sizes
+    3. Importing fonts from Google Fonts (free!)
+    ============================================================
+  -->
+
+  <style>
+    /*
+    ============================================================
+    LESSON 2: CSS — STYLING THE PAGE
+    ============================================================
+    CSS is how we make things look good.
+    Syntax is always:  selector { property: value; }
+    Example:  body { background: black; }
+    ============================================================
+    */
+
+    /* CSS Variables — think of these as color "nicknames" we can reuse */
+    :root {
+      --ink:       #1a1208;
+      --cream:     #f5f0e8;
+      --gold:      #c8902a;
+      --rust:      #b84c2b;
+      --sage:      #4a6741;
+      --paper:     #fdf8f0;
+      --shadow:    rgba(26,18,8,0.12);
+    }
+
+    /* Reset browser defaults — every browser adds its own spacing, we clear it */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--cream);
+      color: var(--ink);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ---- DECORATIVE BACKGROUND TEXTURE ---- */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        radial-gradient(ellipse at 15% 20%, rgba(200,144,42,0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 85% 75%, rgba(184,76,43,0.07) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ---- HEADER ---- */
+    header {
+      position: relative;
+      z-index: 10;
+      padding: 3rem 2rem 2rem;
+      text-align: center;
+      border-bottom: 1px solid rgba(26,18,8,0.1);
+    }
+
+    .header-eyebrow {
+      font-size: 0.7rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.75rem;
+    }
+
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.8rem, 6vw, 5rem);
+      font-weight: 700;
+      line-height: 1;
+      color: var(--ink);
+    }
+
+    h1 em {
+      font-style: italic;
+      color: var(--rust);
+    }
+
+    .header-sub {
+      margin-top: 1rem;
+      font-size: 0.95rem;
+      color: rgba(26,18,8,0.55);
+      max-width: 480px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* ---- MAIN SEARCH CARD ---- */
+    main {
+      position: relative;
+      z-index: 10;
+      max-width: 760px;
+      margin: 3rem auto;
+      padding: 0 1.5rem;
+    }
+
+    .search-card {
+      background: var(--paper);
+      border: 1px solid rgba(26,18,8,0.1);
+      border-radius: 2px;
+      padding: 2.5rem;
+      box-shadow: 0 8px 40px var(--shadow), 0 1px 0 rgba(255,255,255,0.8) inset;
+    }
+
+    .search-label {
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    /* ---- FORM GRID ---- */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+
+    /* On small screens, stack the columns */
+    @media (max-width: 540px) {
+      .form-grid { grid-template-columns: 1fr; }
+    }
+
+    .field { display: flex; flex-direction: column; }
+
+    /* ---- SELECT & INPUT STYLING ---- */
+    select, input[type="text"] {
+      appearance: none;
+      background: white;
+      border: 1px solid rgba(26,18,8,0.18);
+      border-radius: 2px;
+      padding: 0.85rem 1rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      color: var(--ink);
+      transition: border-color 0.2s, box-shadow 0.2s;
+      width: 100%;
+    }
+
+    select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23c8902a' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 1rem center;
+      padding-right: 2.5rem;
+      cursor: pointer;
+    }
+
+    select:focus, input[type="text"]:focus {
+      outline: none;
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(200,144,42,0.12);
+    }
+
+    /* ---- SEARCH BUTTON ---- */
+    .search-btn {
+      width: 100%;
+      padding: 1rem;
+      background: var(--ink);
+      color: var(--cream);
+      border: none;
+      border-radius: 2px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .search-btn:hover  { background: var(--rust); }
+    .search-btn:active { transform: scale(0.99); }
+
+    .search-btn.loading::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: -100%;
+      height: 3px; width: 100%;
+      background: var(--gold);
+      animation: loadbar 1.8s ease-in-out infinite;
+    }
+
+    @keyframes loadbar {
+      0%   { left: -100%; }
+      50%  { left: 0%; }
+      100% { left: 100%; }
+    }
+
+    /* ---- API NOTICE BOX ---- */
+    .notice-box {
+      margin-top: 1.5rem;
+      padding: 1rem 1.25rem;
+      background: rgba(200,144,42,0.08);
+      border-left: 3px solid var(--gold);
+      border-radius: 0 2px 2px 0;
+      font-size: 0.82rem;
+      line-height: 1.6;
+      color: rgba(26,18,8,0.7);
+    }
+
+    .notice-box strong { color: var(--ink); }
+
+    /* ---- RESULTS AREA ---- */
+    #results {
+      margin-top: 2.5rem;
+    }
+
+    .results-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 1.25rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid rgba(26,18,8,0.1);
+    }
+
+    .results-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+    }
+
+    .results-count {
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+
+    /* ---- RESTAURANT CARDS ---- */
+    .restaurant-card {
+      background: white;
+      border: 1px solid rgba(26,18,8,0.08);
+      border-radius: 2px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      display: flex;
+      gap: 1.25rem;
+      align-items: flex-start;
+      transition: box-shadow 0.2s, transform 0.2s;
+      animation: cardIn 0.4s ease both;
+    }
+
+    .restaurant-card:hover {
+      box-shadow: 0 6px 24px var(--shadow);
+      transform: translateY(-2px);
+    }
+
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .card-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      font-weight: 700;
+      color: rgba(26,18,8,0.08);
+      line-height: 1;
+      min-width: 2.5rem;
+    }
+
+    .card-body { flex: 1; }
+
+    .card-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.15rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .card-cuisine {
+      display: inline-block;
+      font-size: 0.68rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: white;
+      background: var(--sage);
+      padding: 0.2rem 0.6rem;
+      border-radius: 1px;
+      margin-bottom: 0.6rem;
+    }
+
+    .card-address {
+      font-size: 0.85rem;
+      color: rgba(26,18,8,0.5);
+      margin-bottom: 0.5rem;
+    }
+
+    .card-dish {
+      font-size: 0.85rem;
+      color: var(--rust);
+      font-weight: 500;
+    }
+
+    .card-dish::before { content: '🍽 '; }
+
+    .card-rating {
+      font-size: 0.8rem;
+      color: var(--gold);
+      font-weight: 500;
+    }
+
+    .card-link {
+      display: inline-block;
+      margin-top: 0.6rem;
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--gold);
+      text-decoration: none;
+      border-bottom: 1px solid currentColor;
+      transition: color 0.15s;
+    }
+    .card-link:hover { color: var(--rust); }
+
+    /* ---- CLICKABLE CARDS ---- */
+    .restaurant-card { cursor: pointer; }
+
+    .card-expand {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.35s ease, padding 0.35s ease;
+      border-top: 0px solid rgba(26,18,8,0.08);
+    }
+
+    .restaurant-card.open .card-expand {
+      max-height: 300px;
+      padding-top: 1rem;
+      border-top-width: 1px;
+      margin-top: 1rem;
+    }
+
+    .card-action-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin-top: 0.25rem;
+    }
+
+    .card-action {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.5rem 1rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-decoration: none;
+      border-radius: 2px;
+      border: none;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+    }
+
+    .card-action:active { transform: scale(0.97); }
+
+    .card-action.primary {
+      background: var(--ink);
+      color: var(--cream);
+    }
+    .card-action.primary:hover { background: var(--rust); }
+
+    .card-action.secondary {
+      background: rgba(26,18,8,0.07);
+      color: var(--ink);
+    }
+    .card-action.secondary:hover { background: rgba(26,18,8,0.13); }
+
+    .card-expand-hint {
+      font-size: 0.72rem;
+      color: rgba(26,18,8,0.3);
+      margin-top: 0.75rem;
+      letter-spacing: 0.05em;
+    }
+
+    /* ---- ERROR / EMPTY STATES ---- */
+    .state-msg {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: rgba(26,18,8,0.4);
+    }
+    .state-msg .icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+    .state-msg p { font-size: 0.9rem; line-height: 1.7; }
+
+    /* ---- FOOTER ---- */
+    footer {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+      padding: 2rem;
+      font-size: 0.75rem;
+      color: rgba(26,18,8,0.35);
+      border-top: 1px solid rgba(26,18,8,0.07);
+      margin-top: 4rem;
+    }
+
+    /* ---- SETUP GUIDE PANEL ---- */
+    .setup-panel {
+      background: var(--paper);
+      border: 1px solid rgba(26,18,8,0.1);
+      border-radius: 2px;
+      padding: 2rem 2.5rem;
+      margin-top: 2rem;
+    }
+
+    .setup-panel h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .step {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+      align-items: flex-start;
+    }
+
+    .step-num {
+      min-width: 2rem;
+      height: 2rem;
+      background: var(--ink);
+      color: var(--cream);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+
+    .step-text { font-size: 0.88rem; line-height: 1.7; color: rgba(26,18,8,0.75); }
+    .step-text strong { color: var(--ink); }
+    .step-text code {
+      background: rgba(26,18,8,0.06);
+      padding: 0.1em 0.4em;
+      border-radius: 3px;
+      font-family: monospace;
+      font-size: 0.85em;
+    }
+
+    .tab-bar {
+      display: flex;
+      gap: 0;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid rgba(26,18,8,0.1);
+    }
+
+    .tab {
+      padding: 0.6rem 1.25rem;
+      font-size: 0.8rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      border: none;
+      background: none;
+      color: rgba(26,18,8,0.4);
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      font-family: 'DM Sans', sans-serif;
+      transition: color 0.2s;
+    }
+
+    .tab.active {
+      color: var(--ink);
+      border-bottom-color: var(--gold);
+    }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+  </style>
+</head>
+
+<body>
+
+  <!--
+  ============================================================
+  LESSON 3: HTML BODY — WHAT USERS ACTUALLY SEE
+  ============================================================
+  Everything inside <body> is visible on the page.
+  HTML tags are like labeled containers:
+    <header>  = top section
+    <main>    = main content
+    <footer>  = bottom section
+    <div>     = generic container / box
+    <p>       = paragraph
+    <h1>-<h6> = headings (h1 is biggest)
+  ============================================================
+  -->
+
+  <header>
+    <div class="header-eyebrow">Restaurant Discovery Engine</div>
+    <h1>Crave<em>Finder</em></h1>
+    <p class="header-sub">Find every restaurant serving the exact dish you're craving — across 16 US cities.</p>
+  </header>
+
+  <main>
+
+    <!-- TAB NAVIGATION -->
+    <div class="tab-bar">
+      <button class="tab active" onclick="switchTab('search')">🔍 Search</button>
+      <button class="tab" onclick="switchTab('setup')">⚙️ Setup Guide</button>
+    </div>
+
+    <!-- ======= SEARCH TAB ======= -->
+    <div id="tab-search" class="tab-content active">
+
+      <div class="search-card">
+
+        <div class="form-grid">
+          <!--
+            LESSON 4: FORM ELEMENTS
+            <select> = dropdown menu
+            <option> = each item inside the dropdown
+            <input>  = text box for typing
+            The "id" attribute gives each element a unique name
+            so JavaScript can find it later.
+          -->
+          <div class="field">
+            <label class="search-label" for="city-select">Choose a City</label>
+            <select id="city-select">
+              <option value="">— Select City —</option>
+              <option value="New York,NY">New York, NY</option>
+              <option value="Los Angeles,CA">Los Angeles, CA</option>
+              <option value="Chicago,IL">Chicago, IL</option>
+              <option value="Houston,TX">Houston, TX</option>
+              <option value="Phoenix,AZ">Phoenix, AZ</option>
+              <option value="Philadelphia,PA">Philadelphia, PA</option>
+              <option value="San Antonio,TX">San Antonio, TX</option>
+              <option value="San Diego,CA">San Diego, CA</option>
+              <option value="Dallas,TX">Dallas, TX</option>
+              <option value="Jacksonville,FL">Jacksonville, FL</option>
+              <option value="Austin,TX">Austin, TX</option>
+              <option value="Fort Worth,TX">Fort Worth, TX</option>
+              <option value="Columbus,OH">Columbus, OH</option>
+              <option value="Charlotte,NC">Charlotte, NC</option>
+              <option value="San Francisco,CA">San Francisco, CA</option>
+              <option value="Pittsburgh,PA">Pittsburgh, PA</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label class="search-label" for="dish-input">What Are You Craving?</label>
+            <input
+              type="text"
+              id="dish-input"
+              placeholder="e.g. chicken caesar wrap"
+            />
+          </div>
+        </div>
+
+        <!--
+          LESSON 5: BUTTONS & EVENTS
+          onclick="searchRestaurants()" means:
+          "When this button is clicked, run the JavaScript
+           function called searchRestaurants"
+        -->
+        <button class="search-btn" id="search-btn" onclick="searchRestaurants()">
+          Search Menus
+        </button>
+
+
+
+      </div>
+
+      <!-- Results appear here dynamically -->
+      <div id="results"></div>
+
+    </div><!-- end search tab -->
+
+
+    <!-- ======= SETUP GUIDE TAB ======= -->
+    <div id="tab-setup" class="tab-content">
+      <div class="setup-panel">
+        <h2>Deploying Your Backend Server (Free)</h2>
+        <p style="font-size:0.88rem;color:rgba(26,18,8,0.6);margin-bottom:1.5rem;line-height:1.7">
+          We'll deploy a tiny Java server to <strong>Render.com</strong> for free.
+          It acts as a secure middleman between CraveFinder and Foursquare — solving
+          the CORS problem permanently. No credit card needed.
+        </p>
+
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-text">
+            <strong>Create a free GitHub account</strong> at
+            <a href="https://github.com" target="_blank" style="color:var(--gold)">github.com</a>
+            if you don't have one. GitHub is where developers store and share code —
+            think of it like Google Drive but for code.
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-text">
+            <strong>Upload the server files to a new GitHub repository.</strong>
+            <br/>① Click the <strong>+</strong> icon on GitHub → <strong>"New repository"</strong>
+            <br/>② Name it <code>cravefinder-server</code> → click <strong>"Create repository"</strong>
+            <br/>③ Upload these files (drag & drop onto the page):
+            <code>pom.xml</code>, <code>render.yaml</code>, and the
+            <code>src/</code> folder with the Java files inside
+            (download them from the files below ↓)
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-text">
+            <strong>Create a free Render.com account</strong> at
+            <a href="https://render.com" target="_blank" style="color:var(--gold)">render.com</a>
+            — sign up with your GitHub account (one click).
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-text">
+            <strong>Create a new Web Service on Render.</strong>
+            <br/>① Click <strong>"New +"</strong> → <strong>"Web Service"</strong>
+            <br/>② Connect your GitHub repo (<code>cravefinder-server</code>)
+            <br/>③ Render reads <code>render.yaml</code> and fills in the settings automatically
+            <br/>④ Under <strong>"Environment Variables"</strong>, add:
+            <br/>&nbsp;&nbsp;&nbsp;Key: <code>FOURSQUARE_API_KEY</code>
+            <br/>&nbsp;&nbsp;&nbsp;Value: <em>your Foursquare API key</em>
+            <br/>⑤ Click <strong>"Create Web Service"</strong> — Render builds and deploys it!
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">5</div>
+          <div class="step-text">
+            <strong>Copy your server URL and paste it below.</strong>
+            After deploying, Render gives you a URL like
+            <code>https://cravefinder-api.onrender.com</code>.
+            Paste it here and click Save:
+            <br/><br/>
+            <input type="text" id="api-key-input" placeholder="https://your-app-name.onrender.com" style="margin-top:0.25rem"/>
+            <button onclick="saveApiKey()" style="margin-top:0.5rem;padding:0.6rem 1.25rem;background:var(--ink);color:var(--cream);border:none;border-radius:2px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:0.82rem;letter-spacing:0.08em">
+              Save URL
+            </button>
+            <span id="key-saved" style="display:none;color:var(--sage);font-size:0.82rem;margin-left:0.75rem">✓ Saved!</span>
+            <br/><br/>
+            You can verify it works by visiting:
+            <code id="health-url">https://your-app.onrender.com/api/health</code>
+            — it should show <code>{"status":"ok"}</code>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">6</div>
+          <div class="step-text">
+            <strong>⚠️ Free tier note:</strong> Render's free servers
+            "spin down" after 15 minutes of inactivity. The first search
+            after a long break may take 30–60 seconds to wake up.
+            After that, it's fast. This is normal and expected on the free plan!
+          </div>
+        </div>
+
+      </div>
+    </div><!-- end setup tab -->
+
+  </main>
+
+  <footer>
+    CraveFinder &mdash; Powered by Foursquare Places API &mdash; A learning project
+  </footer>
+
+
+  <!--
+  ============================================================
+  LESSON 6: JAVASCRIPT — THE BRAIN OF THE APP
+  ============================================================
+  HTML = structure (the skeleton)
+  CSS  = style    (the clothes)
+  JS   = behavior (the muscles & brain)
+
+  JavaScript runs IN the browser and can:
+  - React to clicks
+  - Fetch data from the internet
+  - Change what's shown on the page
+  ============================================================
+  -->
+
+  <script>
+    // ---- LESSON 7: VARIABLES ----
+    // Variables store information. 'let' means the value can change later.
+    // 'const' means it never changes.
+
+    const CITIES = {
+      "New York,NY":       { lat: 40.7128, lon: -74.0060 },
+      "Los Angeles,CA":    { lat: 34.0522, lon: -118.2437 },
+      "Chicago,IL":        { lat: 41.8781, lon: -87.6298 },
+      "Houston,TX":        { lat: 29.7604, lon: -95.3698 },
+      "Phoenix,AZ":        { lat: 33.4484, lon: -112.0740 },
+      "Philadelphia,PA":   { lat: 39.9526, lon: -75.1652 },
+      "San Antonio,TX":    { lat: 29.4241, lon: -98.4936 },
+      "San Diego,CA":      { lat: 32.7157, lon: -117.1611 },
+      "Dallas,TX":         { lat: 32.7767, lon: -96.7970 },
+      "Jacksonville,FL":   { lat: 30.3322, lon: -81.6557 },
+      "Austin,TX":         { lat: 30.2672, lon: -97.7431 },
+      "Fort Worth,TX":     { lat: 32.7555, lon: -97.3308 },
+      "Columbus,OH":       { lat: 39.9612, lon: -82.9988 },
+      "Charlotte,NC":      { lat: 35.2271, lon: -80.8431 },
+      "San Francisco,CA":  { lat: 37.7749, lon: -122.4194 },
+      "Pittsburgh,PA":     { lat: 40.4406, lon: -79.9959 },
+    };
+
+    // This will hold the user's Foursquare API key once they enter it
+    let fsqApiKey = localStorage.getItem('fsqKey') || '';
+
+    // ---- LESSON 8: FUNCTIONS ----
+    // A function is a reusable block of code. We define it once, call it many times.
+
+    function switchTab(name) {
+      // Hide all tab contents
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+
+      // Show the chosen one
+      document.getElementById('tab-' + name).classList.add('active');
+      // Find the matching tab button and highlight it
+      document.querySelectorAll('.tab').forEach(btn => {
+        if (btn.getAttribute('onclick').includes(name)) btn.classList.add('active');
+      });
+    }
+
+    function saveApiKey() {
+      const val = document.getElementById('api-key-input').value.trim().replace(/\/$/, '');
+      if (val) {
+        localStorage.setItem('serverUrl', val);
+        // Update the health check URL display
+        const healthEl = document.getElementById('health-url');
+        if (healthEl) healthEl.textContent = val + '/api/health';
+        document.getElementById('key-saved').style.display = 'inline';
+        setTimeout(() => document.getElementById('key-saved').style.display = 'none', 3000);
+      }
+    }
+
+    // ---- THE MAIN SEARCH FUNCTION ----
+    async function searchRestaurants() {
+      const city = document.getElementById('city-select').value;
+      const dish = document.getElementById('dish-input').value.trim();
+
+      if (!city || !dish) {
+        showError('Please select a city and enter a dish name.');
+        return;
+      }
+
+      const btn = document.getElementById('search-btn');
+      btn.textContent = 'Searching…';
+      btn.classList.add('loading');
+      btn.disabled = true;
+
+      const resultsDiv = document.getElementById('results');
+      resultsDiv.innerHTML = '<div class="state-msg"><div class="icon">🔍</div><p>Scanning menus across ' + city + '…</p></div>';
+
+      try {
+        const serverUrl = localStorage.getItem('serverUrl');
+        if (serverUrl) {
+          await searchFoursquare(city, dish);
+        } else {
+          await new Promise(r => setTimeout(r, 1200));
+          showDemoResults(city, dish);
+        }
+      } catch (err) {
+        document.getElementById('results').innerHTML = `
+          <div class="state-msg">
+            <div class="icon">⚠️</div>
+            <p><strong>Search failed:</strong> ${err.message}</p>
+            <p style="margin-top:0.75rem;font-size:0.8rem;line-height:1.9">
+              Common fixes:<br/>
+              • Double-check your API key in the ⚙️ Setup Guide tab<br/>
+              • Make sure you copied the full key with no extra spaces<br/>
+              • Try again in a few seconds if the proxy is temporarily busy
+            </p>
+            <button onclick="showDemoResults(document.getElementById('city-select').value, document.getElementById('dish-input').value)" style="margin-top:1rem;padding:0.5rem 1.25rem;background:var(--ink);color:var(--cream);border:none;border-radius:2px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:0.82rem">
+              Show Demo Results Instead
+            </button>
+          </div>`;
+      }
+
+      btn.textContent = 'Search Menus';
+      btn.classList.remove('loading');
+      btn.disabled = false;
+    }
+
+    // ---- SEARCH VIA YOUR RENDER.COM BACKEND ----
+    async function searchFoursquare(city, dish) {
+      const SERVER_URL = localStorage.getItem('serverUrl') || '';
+
+      if (!SERVER_URL) {
+        throw new Error('Server URL not set. Go to ⚙️ Setup Guide and enter your Render.com URL.');
+      }
+
+      const url = `${SERVER_URL}/api/search?dish=${encodeURIComponent(dish)}&city=${encodeURIComponent(city)}`;
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err.error || `Server returned status ${response.status}`);
+      }
+
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+      if (data.status && data.status !== 'OK') {
+        throw new Error(`Google error: ${data.status} — ${data.error_message || 'check your API key'}`);
+      }
+
+      renderResults(data.results, dish, city);
+    }
+
+    // ---- RENDER RESULTS ----
+    function renderResults(restaurants, dish, city) {
+      const resultsDiv = document.getElementById('results');
+
+      if (!restaurants || restaurants.length === 0) {
+        resultsDiv.innerHTML = `
+          <div class="state-msg">
+            <div class="icon">🍽️</div>
+            <p>No restaurants found serving <strong>${dish}</strong> in <strong>${city}</strong>.<br/>Try a different dish or city.</p>
+          </div>`;
+        return;
+      }
+
+      let html = `
+        <div class="results-header">
+          <span class="results-title">Results for "${dish}"</span>
+          <span class="results-count">${restaurants.length} restaurants in ${city}</span>
+        </div>`;
+
+      restaurants.forEach((r, index) => {
+        const rating    = r.rating ? parseFloat(r.rating).toFixed(1) : null;
+        const stars     = rating ? '★'.repeat(Math.round(r.rating)) + '☆'.repeat(5 - Math.round(r.rating)) : '—';
+        const address   = r.formatted_address || 'Address unavailable';
+        const rawType   = r.types && r.types[0] ? r.types[0] : 'restaurant';
+        const cuisine   = rawType.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        const openNow   = r.opening_hours ? (r.opening_hours.open_now ? '🟢 Open now' : '🔴 Closed') : '';
+
+        // Clicking the rating now opens Google Maps reviews for that place
+        const placeId      = r.place_id || '';
+        const reviewsUrl   = placeId
+          ? `https://www.google.com/maps/place/?q=place_id:${placeId}`
+          : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(r.name + ' ' + address)}`;
+
+        // Clickable star rating
+        const ratingStr = rating
+          ? `<a href="${reviewsUrl}" target="_blank" onclick="event.stopPropagation()"
+               style="color:var(--gold);font-weight:500;font-size:0.8rem;text-decoration:none;border-bottom:1px dotted var(--gold);"
+               title="Click to read reviews">
+               ${'★'.repeat(Math.round(r.rating))}${'☆'.repeat(5 - Math.round(r.rating))}
+               ${rating} (${r.user_ratings_total || 0} reviews) ↗
+             </a>`
+          : 'Not yet rated';
+
+        const menuSearchUrl = `https://www.google.com/search?q=${encodeURIComponent(r.name + ' ' + city + ' menu')}`;
+        const mapsUrl       = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(r.name + ' ' + address)}`;
+
+        // Online ordering — search Google for the restaurant's order page
+        // This surfaces DoorDash, Uber Eats, direct ordering, etc.
+        const orderUrl  = `https://www.google.com/search?q=${encodeURIComponent(r.name + ' ' + city + ' order online')}`;
+
+        const websiteBtn = r.website
+          ? `<a class="card-action secondary" href="${r.website}" target="_blank" onclick="event.stopPropagation()">🌐 Website</a>`
+          : '';
+        const phone    = r.formatted_phone_number || '';
+        const phoneBtn = phone
+          ? `<a class="card-action secondary" href="tel:${phone}" onclick="event.stopPropagation()">📞 ${phone}</a>`
+          : '';
+
+        html += `
+          <div class="restaurant-card" style="animation-delay:${index * 60}ms" onclick="toggleCard(this)">
+            <div class="card-num">${String(index + 1).padStart(2,'0')}</div>
+            <div class="card-body">
+              <div class="card-name">${r.name}</div>
+              <span class="card-cuisine">${cuisine}</span>
+              <div class="card-address">📍 ${address}</div>
+              <div class="card-dish">${dish}</div>
+              <div class="card-rating">${ratingStr}</div>
+              ${openNow ? `<div class="card-address" style="margin-top:0.3rem">${openNow}</div>` : ''}
+              <div class="card-expand-hint">Click for options ↓</div>
+              <div class="card-expand">
+                <div class="card-action-row">
+                  <a class="card-action primary" href="${orderUrl}" target="_blank" onclick="event.stopPropagation()">🛒 Order Online</a>
+                  <a class="card-action primary" href="${menuSearchUrl}" target="_blank" onclick="event.stopPropagation()">🍽 View Menu</a>
+                  <a class="card-action secondary" href="${reviewsUrl}" target="_blank" onclick="event.stopPropagation()">⭐ Read Reviews</a>
+                  <a class="card-action secondary" href="${mapsUrl}" target="_blank" onclick="event.stopPropagation()">🗺 Get Directions</a>
+                  ${websiteBtn}
+                  ${phoneBtn}
+                </div>
+              </div>
+            </div>
+          </div>`;
+      });
+
+      resultsDiv.innerHTML = html;
+    }
+
+    function toggleCard(card) {
+      document.querySelectorAll('.restaurant-card.open').forEach(c => {
+        if (c !== card) c.classList.remove('open');
+      });
+      card.classList.toggle('open');
+      const hint = card.querySelector('.card-expand-hint');
+      if (hint) {
+        hint.textContent = card.classList.contains('open') ? 'Click to collapse ↑' : 'Click for options ↓';
+      }
+    }
+
+
+    // ---- DEMO DATA (shown when no API key is set) ----
+    function showDemoResults(city, dish) {
+      const demoData = [
+        { name: "The Garden Grille",        cuisine: "American",        address: "142 Main St", rating: 4.5, reviews: 312, dish: dish },
+        { name: "Coastal Kitchen",          cuisine: "Mediterranean",   address: "88 Harbor Ave", rating: 4.3, reviews: 189, dish: dish },
+        { name: "Uptown Eats",             cuisine: "Contemporary",    address: "501 Elm Blvd", rating: 4.7, reviews: 523, dish: dish },
+        { name: "The Local Table",         cuisine: "Farm-to-Table",   address: "27 Oak Lane", rating: 4.2, reviews: 98,  dish: dish },
+        { name: "Rosso Bistro",            cuisine: "Italian-American", address: "310 Vine St",  rating: 4.6, reviews: 441, dish: dish },
+        { name: "Meridian Café",           cuisine: "Café & Bakery",   address: "75 Cedar Rd",  rating: 4.1, reviews: 207, dish: dish },
+      ];
+
+      let html = `
+        <div class="results-header">
+          <span class="results-title">Results for "${dish}"</span>
+          <span class="results-count">${demoData.length} restaurants in ${city} <em style="color:var(--rust);font-style:normal">[demo]</em></span>
+        </div>
+        <div class="notice-box" style="margin-bottom:1.25rem">
+          📋 <strong>Demo mode:</strong> Add your free Foursquare API key in the ⚙️ Setup Guide tab to see real restaurants near you.
+        </div>`;
+
+      demoData.forEach((r, i) => {
+        const stars = '★'.repeat(Math.round(r.rating)) + '☆'.repeat(5 - Math.round(r.rating));
+        html += `
+          <div class="restaurant-card" style="animation-delay:${i * 60}ms">
+            <div class="card-num">${String(i + 1).padStart(2,'0')}</div>
+            <div class="card-body">
+              <div class="card-name">${r.name}</div>
+              <span class="card-cuisine">${r.cuisine}</span>
+              <div class="card-address">📍 ${r.address}, ${city}</div>
+              <div class="card-dish">${r.dish}</div>
+              <div class="card-rating">${stars} ${r.rating} (${r.reviews} reviews)</div>
+            </div>
+          </div>`;
+      });
+
+      document.getElementById('results').innerHTML = html;
+    }
+
+    function showError(msg) {
+      document.getElementById('results').innerHTML = `
+        <div class="state-msg">
+          <div class="icon">⚠️</div>
+          <p>${msg}</p>
+        </div>`;
+    }
+
+    // ---- LESSON 10: EVENT LISTENERS ----
+    // Allow pressing Enter in the dish input to trigger search
+    document.getElementById('dish-input').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') searchRestaurants();
+      // 'e' is the event object — it tells us which key was pressed
+    });
+
+    // Pre-fill server URL input if one was previously saved
+    const savedUrl = localStorage.getItem('serverUrl');
+    if (savedUrl) {
+      const inp = document.getElementById('api-key-input');
+      if (inp) inp.value = savedUrl;
+      const healthEl = document.getElementById('health-url');
+      if (healthEl) healthEl.textContent = savedUrl + '/api/health';
+    }
+
+    // ============================================================
+    // PWA: REGISTER SERVICE WORKER
+    // ============================================================
+    // This is what makes the app installable and work offline.
+    // We check the browser supports service workers first,
+    // then register our sw.js file.
+    // 'if' in JavaScript means: only run this code if the
+    // condition in parentheses is true.
+    // ============================================================
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+          .then(reg => console.log('[PWA] Service worker registered:', reg.scope))
+          .catch(err => console.log('[PWA] Service worker failed:', err));
+      });
+    }
+
+  </script>
+
+</body>
+</html>
